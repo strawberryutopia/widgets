@@ -110,9 +110,9 @@ function update_fronter() {
 			// Except for when loading the page, or switching from a private member, mark a switch
 			if (fronter != "tbc") {
 				$("#header").text("Switching")
+				$("#avatar").attr("src", "loading.svg")
 			}
 			$("#name").text("TBC")
-			$("#avatar").attr("src", "loading.svg")
 
 			setTimeout(
 
