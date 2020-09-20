@@ -12,140 +12,141 @@
 
 
 <style>
-#whoami {
-  display: inline-block;
-  height: 100px;
-  width: 250px;
-  overflow: hidden;
-  padding: 0;
-  border-radius: 50px;
-  border-top-right-radius: 5px;
-  padding-right: 20px;
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  transition-duration: 1s;
-}
+	#whoami {
+		display: inline-block;
+		height: 100px;
+		width: 250px;
+		overflow: hidden;
+		padding: 0;
+		border-radius: 50px;
+		border-top-right-radius: 5px;
+		padding-right: 20px;
+		position: fixed;
+		top: 10px;
+		right: 10px;
+		transition-duration: 1s;
+	}
 
-h1,
-h2 {
-  margin: 0;
-  color: white;
-}
+	h1,
+	h2,
+	h3 {
+		margin: 0;
+		color: white;
+	}
 
-#avatar {
-  width: 100px;
-  height: 100px;
-  vertical-align: middle;
-  background: white;
-}
+	#avatar {
+		width: 100px;
+		height: 100px;
+		vertical-align: middle;
+		background: white;
+	}
 
-#fronter {
-  display: inline-block;
-  vertical-align: middle;
-}
+	#fronter {
+		display: inline-block;
+		vertical-align: middle;
+	}
 
-* {
-  font-family: sans-serif;
-}
+	* {
+		font-family: sans-serif;
+	}
 </style>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <div id="whoami" style="background: black">
-  <img id="avatar" src="loading.svg" />
-  <div id="fronter">
-    <h2 id="header">Fronter</h2>
-    <h1 id="name">TBC</h1>
-  </div>
+	<img id="avatar" src="loading.svg" />
+	<div id="fronter">
+		<h3 id="pronouns">Fronter</h3>
+		<h1 id="name">TBC</h1>
+	</div>
 </div>
 
 
 <script>
-fronter = "tbc"
+	fronter = "tbc"
 
-function update_fronter() {
-	$.getJSON("https://api.lmhd.me/v1/front.json", function(data) {
+	function update_fronter() {
+		$.getJSON("https://api.lmhd.me/v1/front.json", function (data) {
 
-		console.log(data)
+			console.log(data)
 
-		// if we've just switched...
-		if (data.members && data.members[0].name != fronter) {
-			console.log("We have members")
-			console.log("Current fronter: " + fronter + " != New fronter " + data.members[0].name)
+			// if we've just switched...
+			if (data.members && data.members[0].name != fronter) {
+				console.log("We have members")
+				console.log("Current fronter: " + fronter + " != New fronter " + data.members[0].name)
 
-			// if we've switched to somebody who is not hidden
-			if (data.members) {
+				// if we've switched to somebody who is not hidden
+				if (data.members) {
+
+					// Except for when loading the page, or switching from a private member, mark a switch
+					if (fronter != "tbc") {
+						$("#pronouns").text("Switching")
+					}
+					$("#name").text("TBC")
+					$("#avatar").attr("src", "loading.svg")
+
+					setTimeout(
+						function () {
+							update_widget(data);
+						},
+						3000
+					);
+				}
+
+				fronter = data.members[0].name
+			} else {
+				if (data.members) {
+					console.log("We have members")
+					console.log("Current fronter: " + fronter + " == New fronter " + data.members[0].name)
+					fronter = data.members[0].name
+					return
+				}
+
+				// If fronter is already null...
+				if (!fronter) {
+					console.log("We have no current fronter")
+					console.log("Current fronter: " + fronter + " ; New fronter " + data.members)
+					return
+				}
 
 				// Except for when loading the page, or switching from a private member, mark a switch
 				if (fronter != "tbc") {
-					$("#header").text("Switching")
+					$("#pronouns").text("Switching")
+					$("#avatar").attr("src", "loading.svg")
 				}
 				$("#name").text("TBC")
-				$("#avatar").attr("src", "loading.svg")
 
 				setTimeout(
-					function(){
-						update_widget(data);
+
+					function () {
+						$("#pronouns").text("Fronter")
+						$("#avatar").attr("src", "unknown.png")
+						$("#name").text("NULL")
+						$("#whoami").css("background", "#000")
 					},
 					3000
 				);
+
+				fronter = null
 			}
-
-			fronter = data.members[0].name
-		} else {
-			if (data.members) {
-				console.log("We have members")
-				console.log("Current fronter: " + fronter + " == New fronter " + data.members[0].name)
-				fronter = data.members[0].name
-				return
-			}
-
-			// If fronter is already null...
-			if (!fronter) {
-				console.log("We have no current fronter")
-				console.log("Current fronter: " + fronter + " ; New fronter " + data.members)
-				return
-			}
-
-			// Except for when loading the page, or switching from a private member, mark a switch
-			if (fronter != "tbc") {
-				$("#header").text("Switching")
-				$("#avatar").attr("src", "loading.svg")
-			}
-			$("#name").text("TBC")
-
-			setTimeout(
-
-				function(){
-					$("#header").text("Fronter")
-					$("#avatar").attr("src", "unknown.png")
-					$("#name").text("NULL")
-					$("#whoami").css("background", "#000")
-				},
-				3000
-			);
-
-			fronter = null
-		}
-	});
-}
-
-function update_widget(data) {
-	$("#header").text("Fronter")
-
-	if (data.members[0].display_name != "" ) {
-		$("#name").text(data.members[0].display_name)
-	} else {
-		$("#name").text(data.members[0].name)
+		});
 	}
 
-	$("#avatar").attr("src", data.members[0].avatar_url)
+	function update_widget(data) {
+		$("#pronouns").text(data.members[0].pronouns)
 
-	$("#whoami").css("background", "#" + data.members[0].color)
-	// TODO: find a gooc text color based on background color
-}
+		if (data.members[0].display_name != "") {
+			$("#name").text(data.members[0].display_name)
+		} else {
+			$("#name").text(data.members[0].name)
+		}
 
-update_fronter()
+		$("#avatar").attr("src", data.members[0].avatar_url)
 
-setInterval(update_fronter, 5 * 1000);
+		$("#whoami").css("background", "#" + data.members[0].color)
+		// TODO: find a gooc text color based on background color
+	}
+
+	update_fronter()
+
+	setInterval(update_fronter, 5 * 1000);
 </script>
