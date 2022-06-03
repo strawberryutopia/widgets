@@ -134,7 +134,7 @@
 	function update_widget(data) {
 		$("#pronouns").text(data.members[0].pronouns)
 
-		if (data.members[0].display_name != "") {
+		if (data.members[0].display_name != null && data.members[0].display_name != "") {
 			$("#name").text(data.members[0].display_name)
 		} else {
 			$("#name").text(data.members[0].name)
